@@ -1,3 +1,4 @@
+//create Form html structure
 function createForm(){
   //<form action="#" method="get"></form>
   const form = document.createElement('form');
@@ -24,6 +25,7 @@ function createForm(){
 
 }
 
+//create Gallery html structure
 function createGallery(){
   //append card div to gallery div
   const cardDiv = document.createElement('div');
@@ -55,7 +57,8 @@ function createGallery(){
 
   const h3 = document.createElement('h3');
   h3.id = 'name';
-  h3.classList.add('card-name cap');
+  h3.classList.add('card-name');
+  h3.classList.add('cap');
   h3.innerHTML += 'first last';
 
   const pEmail = document.createElement('p');
@@ -73,5 +76,24 @@ function createGallery(){
 
 }
 
+//connecting to API
+const connectToAPI = () => {
+  fetch('https://randomuser.me/api/')
+  .then( res => res.json())
+  .then( data => {
+    console.log(data);
+    getData(data.results);
+  })
+};
+
+//fetch data and add it into appropreate elements
+function getData(data){
+  //img part, get img
+  const img = document.getElementsByClassName('card-img')[0];
+  img.setAttribute('src', data[0].picture.large);
+  console.log(data[0].picture.thumbnail);
+}
+
 createForm();
 createGallery();
+connectToAPI();
