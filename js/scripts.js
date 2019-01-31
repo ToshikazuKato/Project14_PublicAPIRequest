@@ -63,10 +63,12 @@ function createGallery(){
 
   const pEmail = document.createElement('p');
   pEmail.classList.add('card-text');
+  pEmail.classList.add('email');
   pEmail.innerHTML += 'email';
 
   const pCity = document.createElement('p');
   pCity.classList.add('card-text');
+  pCity.classList.add('cap');
   pCity.innerHTML += 'city, state';
 
   cardInfoContainerDiv.appendChild(h3);
@@ -75,25 +77,49 @@ function createGallery(){
   cardDiv.appendChild(cardInfoContainerDiv);
 
 }
-
+const listNum = 12;
+ let dataArr = [];
 //connecting to API
-const connectToAPI = () => {
+const connectToAPI = (i) => {
   fetch('https://randomuser.me/api/')
   .then( res => res.json())
   .then( data => {
-    console.log(data);
-    getData(data.results);
+       dataArr.push(data.results);
+      // createGallery();
+      getData(dataArr, i);
+    // console.log(dataArr);
   })
 };
 
 //fetch data and add it into appropreate elements
-function getData(data){
+function getData(data, i){
+
   //img part, get img
-  const img = document.getElementsByClassName('card-img')[0];
-  img.setAttribute('src', data[0].picture.large);
-  console.log(data[0].picture.thumbnail);
+  const img = document.getElementsByClassName('card-img')[i];
+  img.setAttribute('src', data[i][0].picture.large);
+
+
+  //name
+  const name = document.querySelectorAll('div.card-info-container h3#name')[i];
+  const nameFromData = data[i][0].name["first"] + " " + data[i][0].name["last"];
+  name.innerHTML = nameFromData;
+
+  //email
+  const email = document.querySelectorAll('div.card-info-container p.email')[i];
+  const emailData = data[i][0].email;
+  email.innerHTML = emailData;
+
+  //city,state
+  const city = document.querySelectorAll('div.card-info-container p.cap')[i];
+  const cityData = data[i][0].location["city"];
+  const stateData = data[i][0].location["state"];
+  city.innerHTML = cityData + ", " + stateData;
+
 }
 
 createForm();
-createGallery();
-connectToAPI();
+
+for (let i = 0; i < listNum; i++) {
+  createGallery();
+  connectToAPI(i);
+}
