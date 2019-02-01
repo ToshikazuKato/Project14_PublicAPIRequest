@@ -1,3 +1,16 @@
+//the number of list for users
+const listNum = 12;
+let dataArr = [];
+//connecting to API
+const connectToAPI = (i) => {
+  fetch('https://randomuser.me/api/')
+  .then( res => res.json())
+  .then( data => {
+      dataArr.push(data.results);
+      userDataForGallery(dataArr, i);
+  })
+};
+
 //create Form html structure
 function createForm(){
   //<form action="#" method="get"></form>
@@ -77,26 +90,13 @@ function createGallery(){
   cardDiv.appendChild(cardInfoContainerDiv);
 
 }
-const listNum = 12;
- let dataArr = [];
-//connecting to API
-const connectToAPI = (i) => {
-  fetch('https://randomuser.me/api/')
-  .then( res => res.json())
-  .then( data => {
-       dataArr.push(data.results);
-      // createGallery();
-      getData(dataArr, i);
-    // console.log(dataArr);
-  })
-};
 
 //fetch data and add it into appropreate elements
-function getData(data, i){
+function userDataForGallery(data, i){
 
   //img part, get img
   const img = document.getElementsByClassName('card-img')[i];
-  img.setAttribute('src', data[i][0].picture.large);
+  img.setAttribute('src',data[i][0].picture.large);
 
 
   //name
@@ -117,9 +117,159 @@ function getData(data, i){
 
 }
 
+//create modal html
+function createModal() {
+  const divModalContainer = document.createElement("div");
+  divModalContainer.classList.add("modal-container");
+
+  const divModal = document.createElement("div");
+  divModal.classList.add("modal");
+
+  const btnModal = document.createElement("button");
+  btnModal.id = "modal-close-btn";
+  btnModal.classList.add("modal-close-btn");
+  btnModal.setAttribute("type", "button");
+
+  const strong = document.createElement("strong");
+  strong.innerHTML = "X";
+  btnModal.appendChild(strong);
+
+  const divModalInfoContainer = document.createElement("div");
+  divModalInfoContainer.classList.add("modal-info-container");
+
+  const img = document.createElement("img");
+  img.classList.add("modal-img");
+  img.setAttribute("alt", "Profile Picture");
+
+  const h3 = document.createElement("h3");
+  h3.innerHTML = "name";
+  h3.id = "name";
+  h3.classList.add('modal-name');
+  h3.classList.add('cap');
+
+  const pEmail = document.createElement("p");
+  pEmail.classList.add('modal-text');
+  pEmail.classList.add('email');
+
+  const pCity = document.createElement("p");
+  pCity.classList.add('modal-text');
+  pCity.classList.add("city");
+
+  const pTel = document.createElement("p");
+  pTel.classList.add('modal-text');
+  pTel.classList.add('tel');
+
+  const pAddress = document.createElement("p");
+  pAddress.classList.add('modal-text');
+  pAddress.classList.add('address');
+
+  const pBirthDate = document.createElement("p");
+  pBirthDate.classList.add('modal-text');
+  pBirthDate.classList.add('birthdate');
+
+  const hr = document.createElement("ht");
+
+  divModalInfoContainer.appendChild(img);
+  divModalInfoContainer.appendChild(h3);
+  divModalInfoContainer.appendChild(pEmail);
+  divModalInfoContainer.appendChild(pCity);
+  divModalInfoContainer.appendChild(hr);
+  divModalInfoContainer.appendChild(pTel);
+  divModalInfoContainer.appendChild(pAddress);
+  divModalInfoContainer.appendChild(pBirthDate);
+
+  divModal.appendChild(btnModal);
+  divModal.appendChild(divModalInfoContainer);
+
+  const divModalBtnContainer = document.createElement("div");
+  divModalBtnContainer.classList.add("modal-btn-container");
+
+  const prevBtn = document.createElement("button");
+  prevBtn.innerHTML = "Prev";
+  prevBtn.id = "modal-prev";
+  prevBtn.classList.add('modal-prev');
+  prevBtn.classList.add('btn');
+  prevBtn.setAttribute("type", "button");
+
+  const nextBtn = document.createElement("button");
+  nextBtn.innerHTML = "Next";
+  nextBtn.id = "modal-next";
+  nextBtn.classList.add('modal-next');
+  nextBtn.classList.add('btn');
+  nextBtn.setAttribute("type", "button")
+
+  divModalBtnContainer.appendChild(prevBtn);
+  divModalBtnContainer.appendChild(nextBtn);
+
+  divModalContainer.appendChild(divModal);
+  divModalContainer.appendChild(divModalBtnContainer);
+
+  document.querySelector('body').appendChild(divModalContainer);
+
+}
+
+//add modal function for buttons and click event
+function modalFunc(){
+
+  const modalContainer = document.querySelector("div.modal-container");
+  modalContainer.style.display = "none";
+
+  //display modal when user card is clicked
+  const users = Array.from(document.querySelectorAll("div.card"));
+  users.map((user, index) => {
+    // console.log(users[index]);
+    // console.log(user);
+    users[index].addEventListener('click', e => {
+      //display modal
+      const modalContainer = document.querySelector("div.modal-container");
+      modalContainer.style.display = "block";
+
+      //get user data and display them in modal
+      const imgModal = document.querySelector("img.modal-img");
+      imgModal.setAttribute("src",dataArr[index][0].picture.large);
+
+      const name = document.querySelector("div.modal-info-container h3#name");
+      name.innerHTML = dataArr[index][0].name.first + " " + dataArr[index][0].name.last;
+
+      const email = document.querySelector("div.modal-info-container p.email");
+      email.innerHTML = dataArr[index][0].email;
+
+      const city = document.querySelector("div.modal-info-container p.city");
+      city.innerHTML = "City : " + dataArr[index][0].location.city.substr(0,1).toUpperCase()+dataArr[index][0].location.city.substr(1);
+
+      const tel = document.querySelector("div.modal-info-container p.tel");
+      tel.innerHTML = "Tel : " + dataArr[index][0].cell;
+
+      const address = document.querySelector("div.modal-info-container p.address");
+      address.innerHTML = dataArr[index][0].location.street + ", "
+                        + dataArr[index][0].location.state + ", "
+                        + dataArr[index][0].location.postcode;
+
+      const birthdate = document.querySelector("div.modal-info-container p.birthdate");
+      birthdate.innerHTML = "Birthdate : " + dataArr[index][0].dob.date.substr(0,10);
+
+    });
+  })
+
+  //hide modal when close btn is clicked
+  const closeBtn = document.getElementById("modal-close-btn");
+  closeBtn.addEventListener('click', e => {
+     const modalContainer = document.querySelector("div.modal-container");
+     modalContainer.style.display = "none";
+  });
+
+
+}
+
+//make run functions
 createForm();
 
 for (let i = 0; i < listNum; i++) {
   createGallery();
   connectToAPI(i);
 }
+
+createModal();
+modalFunc();
+
+console.log(dataArr);
