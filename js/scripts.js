@@ -3,7 +3,7 @@ const listNum = 12;
 let dataArr = [];
 //connecting to API
 const connectToAPI = (i) => {
-  fetch('https://randomuser.me/api/')
+  fetch('https://randomuser.me/api/?results=12&nat=us,au,br,ca,us,nz  ')
   .then( res => res.json())
   .then( data => {
       dataArr.push(data.results);
@@ -167,7 +167,7 @@ function createModal() {
   pBirthDate.classList.add('modal-text');
   pBirthDate.classList.add('birthdate');
 
-  const hr = document.createElement("ht");
+  const hr = document.createElement("hr");
 
   divModalInfoContainer.appendChild(img);
   divModalInfoContainer.appendChild(h3);
@@ -211,45 +211,49 @@ function createModal() {
 //add modal function for buttons and click event
 function modalFunc(){
 
+  //default display none
   const modalContainer = document.querySelector("div.modal-container");
   modalContainer.style.display = "none";
+
+  //get user data from API and append to html
+  function modalData(index){
+    //display modal
+    const modalContainer = document.querySelector("div.modal-container");
+    modalContainer.style.display = "block";
+
+    //get user data and display them in modal
+    const imgModal = document.querySelector("img.modal-img");
+    imgModal.setAttribute("src",dataArr[index][0].picture.large);
+
+    const name = document.querySelector("div.modal-info-container h3#name");
+    name.innerHTML = dataArr[index][0].name.first + " " + dataArr[index][0].name.last;
+
+    const email = document.querySelector("div.modal-info-container p.email");
+    email.innerHTML = dataArr[index][0].email;
+
+    const city = document.querySelector("div.modal-info-container p.city");
+    city.innerHTML = "City : " + dataArr[index][0].location.city.substr(0,1).toUpperCase()+dataArr[index][0].location.city.substr(1);
+
+    const tel = document.querySelector("div.modal-info-container p.tel");
+    tel.innerHTML = "Tel : " + dataArr[index][0].cell;
+
+    const address = document.querySelector("div.modal-info-container p.address");
+    address.innerHTML = dataArr[index][0].location.street + ", "
+                      + dataArr[index][0].location.state + ", "
+                      + dataArr[index][0].location.postcode;
+
+    const birthdate = document.querySelector("div.modal-info-container p.birthdate");
+    birthdate.innerHTML = "Birthdate : " + dataArr[index][0].dob.date.substr(0,10);
+  }
 
   //display modal when user card is clicked
   const users = Array.from(document.querySelectorAll("div.card"));
   users.map((user, index) => {
-    // console.log(users[index]);
-    // console.log(user);
-    users[index].addEventListener('click', e => {
-      //display modal
-      const modalContainer = document.querySelector("div.modal-container");
-      modalContainer.style.display = "block";
-
-      //get user data and display them in modal
-      const imgModal = document.querySelector("img.modal-img");
-      imgModal.setAttribute("src",dataArr[index][0].picture.large);
-
-      const name = document.querySelector("div.modal-info-container h3#name");
-      name.innerHTML = dataArr[index][0].name.first + " " + dataArr[index][0].name.last;
-
-      const email = document.querySelector("div.modal-info-container p.email");
-      email.innerHTML = dataArr[index][0].email;
-
-      const city = document.querySelector("div.modal-info-container p.city");
-      city.innerHTML = "City : " + dataArr[index][0].location.city.substr(0,1).toUpperCase()+dataArr[index][0].location.city.substr(1);
-
-      const tel = document.querySelector("div.modal-info-container p.tel");
-      tel.innerHTML = "Tel : " + dataArr[index][0].cell;
-
-      const address = document.querySelector("div.modal-info-container p.address");
-      address.innerHTML = dataArr[index][0].location.street + ", "
-                        + dataArr[index][0].location.state + ", "
-                        + dataArr[index][0].location.postcode;
-
-      const birthdate = document.querySelector("div.modal-info-container p.birthdate");
-      birthdate.innerHTML = "Birthdate : " + dataArr[index][0].dob.date.substr(0,10);
-
-    });
+  users[index].addEventListener('click', e => {
+  modalData(index);
+  });
   })
+
 
   //hide modal when close btn is clicked
   const closeBtn = document.getElementById("modal-close-btn");
@@ -258,8 +262,86 @@ function modalFunc(){
      modalContainer.style.display = "none";
   });
 
+  //nextBtn
+  const nextBtn = document.getElementById("modal-next");
+  nextBtn.addEventListener('click', e => {
+
+    //get index of user in dataArr by comparing email
+    let userIndex;
+    const email = document.querySelector("div.modal-info-container p.email");
+    dataArr.map((elem, index) => {
+      if(email.innerHTML == elem[0].email){
+        userIndex = index;
+      }
+    });
+
+    //display first user in dataArr if it's the last index
+    if(userIndex === 11){
+      modalData(0);
+    }else{
+      //display next user if it's not the last index(11) of dataArr
+      modalData(userIndex+1);
+    }
+
+  });
+
+  //prevBtn
+  const prevBtn = document.getElementById("modal-prev");
+  prevBtn.addEventListener('click', e => {
+
+    //get index of user in dataArr by comparing email
+    let userIndex;
+    const email = document.querySelector("div.modal-info-container p.email");
+    dataArr.map((elem, index) => {
+      if(email.innerHTML == elem[0].email){
+        userIndex = index;
+      }
+    });
+
+    //display previous user in dataArr if it's the first index
+    if(userIndex === 0){
+      modalData(11);
+    }else{
+      //display previous user if it's not the first index(0) of dataArr
+      modalData(userIndex-1);
+    }
+
+  });
 
 }
+
+//search users when typing
+function searchFunc(){
+
+  const search = document.getElementById('search-input');
+
+     search.addEventListener('keyup',(event)=>{
+     event.preventDefault();
+
+     // get user's name from objects
+     const name = document.querySelectorAll("div.card-info-container h3#name.card-name");
+     const usersArrForSearch = Object.keys(name).map((val,index) => {
+       return name[index].innerHTML.toUpperCase();
+     });
+
+     // search function
+     const searchedWord = search.value.toUpperCase();
+     const users = document.getElementsByClassName('card');
+     usersArrForSearch.forEach((val,index)=>{
+
+       if( val.indexOf(searchedWord) > -1 ){
+         users[index].style.display = 'block';
+       }else{
+         users[index].style.display = 'none';
+       }
+
+     });
+
+   });
+
+}
+
+
 
 //make run functions
 createForm();
@@ -271,5 +353,4 @@ for (let i = 0; i < listNum; i++) {
 
 createModal();
 modalFunc();
-
-console.log(dataArr);
+searchFunc();

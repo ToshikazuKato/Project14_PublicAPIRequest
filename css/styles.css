@@ -92,12 +92,26 @@ header h1 {
     border: 1px solid rgba(50, 50, 50, 0.3);
     transition: .4s ease-out;
     overflow: hidden;
+		box-shadow: 2px 3px 7px 3px #ccc; /* Added */
+		transition : all 0.4s; /* Added */
+}
+
+.card:hover{
+	box-shadow: 4px 4px 9px 6px #ccc; /* Added */
 }
 
 .card-img {
     width: 95px;
     margin: 10px 15px auto 10px;
     border-radius: 50%;
+		transition : all 0.4s; /* Added */
+		filter : blur(1px) grayscale(0.8); /* Added */
+}
+
+/* Added */
+.card:hover .card-img{
+	transform: scale(1.2) rotate(7deg);
+	filter : blur(0px) grayscale(0);
 }
 
 .card-info-container {
